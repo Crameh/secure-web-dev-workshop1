@@ -15,7 +15,7 @@ console.log('🚀 It Works!');
 // 📝 TODO: Number of filming locations
 // 1. Make the function return the number of filming locations
 function getFilmingLocationsNumber () {
-	return ''
+	return filmingLocations.length
 }
 console.log(`There is ${getFilmingLocationsNumber()} filming locations in Paris`)
 
@@ -23,17 +23,26 @@ console.log(`There is ${getFilmingLocationsNumber()} filming locations in Paris`
 // 1. Implement the function
 // 2. Log the first and last item in array
 function sortFilmingLocationsByStartDate () {
-	return ''
+	let newJson = filmingLocations.sort(function(itemA, itemB) {return new Date(itemB.fields.date_debut) - new Date(itemA.fields.date_debut)})
+	/*const newJson = Object.keys(filmingLocations).map(function (key) {
+		return filmingLocations[key];
+	  })
+	  .sort(function (itemB, itemA) {
+		return itemA.fields.date_debut - itemB.fields.date_debut;
+	  });*/
+	return newJson
 }
-console.log(``)
+console.log('Le premier et le dernier (date début): ')
+console.log(sortFilmingLocationsByStartDate()[0].fields.date_debut)
+console.log(sortFilmingLocationsByStartDate()[filmingLocations.length-1].fields.date_debut)
 
 // 📝 TODO: Number of filming locations in 2020 only
 // 1. Make the function return the number of filming locations in 2020 only
 // 2. Log the result
 function getFilmingLocationsNumber2020 () {
-	return ''
+	return filmingLocations.filter(function(o) {return o.fields.id_lieu.substring(0,4) == '2020'}).length
 }
-console.log()
+console.log(`There is ${getFilmingLocationsNumber2020()} filming locations in 2020 only`)
 
 // 📝 TODO: Number of filming locations per year
 // 1. Implement the function, the expected result is an object with years as
@@ -44,9 +53,16 @@ console.log()
 //    }
 // 2. Log the result
 function getFilmingLocationsNumberPerYear () {
-	return {}
+	const setYear = new Set()
+	for(let i = parseInt(sortFilmingLocationsByStartDate()[filmingLocations.length - 1].fields.date_debut.substring(0,4)); i < parseInt(sortFilmingLocationsByStartDate()[0].fields.date_debut.substring(0,4)); i++) {
+		setYear.add(i)
+	}
+	let dico = {}
+	setYear.forEach(year => dico[year] = filmingLocations.filter(function(o) {return o.fields.id_lieu.substring(0,4) == year}).length)
+	return dico
 }
-console.log()
+console.log('Films locations per year : ')
+console.log(getFilmingLocationsNumberPerYear())
 
 // 📝 TODO: Number of filming locations by district (arrondissement)
 // 1. Implement the function, the expected result is an object with
@@ -57,32 +73,50 @@ console.log()
 //    }
 // 2. Log the result
 function getFilmingLocationsNumberPerDistrict () {
-	return {}
+	const setDist = new Set()
+	filmingLocations.forEach(film => setDist.add(film.fields.ardt_lieu))
+	let dico = {}
+	setDist.forEach(dist => dico[dist] = filmingLocations.filter(function(o) {return o.fields.ardt_lieu == dist}).length)
+	return dico
 }
-console.log()
+console.log('Films locations per district : ')
+console.log(getFilmingLocationsNumberPerDistrict())
 
 // 📝 TODO: Number of locations per film, sorted in descending order
 // 1. Implement the function, result expected as an array of object like:
 //    const result = [{film: 'LRDM - Patriot season 2', locations: 12}, {...}]
 // 2. Log the first and last item of the array
 function getFilmLocationsByFilm () {
-	return []
+	const setName = new Set()
+	filmingLocations.forEach(film => setName.add(film.fields.nom_tournage))
+	let array = []
+	setName.forEach(name => array.push({film : name, locations: filmingLocations.filter(function(o) {return o.fields.nom_tournage == name}).length}))
+	return array
 }
-console.log()
+console.log('Films locations by film')
+console.log(getFilmLocationsByFilm())
 
 // 📝 TODO: Number of different films
 // 1. Implement the function
 // 2. Log the result
 function getNumberOfFilms() {
-	return ''
+	const setName = new Set()
+	filmingLocations.forEach(film => setName.add(film.fields.nom_tournage))
+	return setName.size
 }
+console.log('Number of different films : ' + getNumberOfFilms())
+
 
 // 📝 TODO: All the filming locations of `LRDM - Patriot season 2`
 // 1. Return an array with all filming locations of LRDM - Patriot season 2
 // 2. Log the result
 function getArseneFilmingLocations () {
-	return []
+	let array = []
+	filmingLocations.filter(function(o) {return o.fields.nom_tournage == `LRDM - Patriot season 2`}).forEach(film => array.push(film))
+	return array
 }
+console.log('Tous les films de `LRDM - Patriot season 2` : ')
+console.log(getArseneFilmingLocations())
 
 // 📝 TODO: Tous les arrondissement des lieux de tournage de nos films favoris
 //  (favoriteFilms)

@@ -54,7 +54,7 @@ console.log(`There is ${getFilmingLocationsNumber2020()} filming locations in 20
 // 2. Log the result
 function getFilmingLocationsNumberPerYear () {
 	const setYear = new Set()
-	for(let i = parseInt(sortFilmingLocationsByStartDate()[filmingLocations.length - 1].fields.date_debut.substring(0,4)); i < parseInt(sortFilmingLocationsByStartDate()[0].fields.date_debut.substring(0,4)); i++) {
+	for(let i = parseInt(sortFilmingLocationsByStartDate()[filmingLocations.length - 1].fields.date_debut.substring(0,4)); i < parseInt(sortFilmingLocationsByStartDate()[0].fields.date_debut.substring(0,4)) + 1; i++) {
 		setYear.add(i)
 	}
 	let dico = {}
@@ -116,7 +116,14 @@ function getArseneFilmingLocations () {
 	return array
 }
 console.log('Tous les films de `LRDM - Patriot season 2` : ')
-console.log(getArseneFilmingLocations())
+//console.log(getArseneFilmingLocations())
+
+const favoriteFilms =
+	[
+		'LRDM - Patriot season 2',
+		'Alice NEVERS',
+		'Emily in Paris',
+	]
 
 // 📝 TODO: Tous les arrondissement des lieux de tournage de nos films favoris
 //  (favoriteFilms)
@@ -125,14 +132,16 @@ console.log(getArseneFilmingLocations())
 //    const films = { 'LRDM - Patriot season 2': ['75013'] }
 // 2. Log the result
 function getFavoriteFilmsLocations (favoriteFilmsNames) {
-	return []
+	const films = {}
+	favoriteFilms.forEach(function(favoriteFilm) {
+		let setArr = new Set()
+		filmingLocations.filter(function(o) {return o.fields.nom_tournage == favoriteFilm}).forEach(film => setArr.add(film.fields.ardt_lieu))
+		films[favoriteFilm] = Array.from(setArr)
+	})
+	return films
 }
-const favoriteFilms =
-	[
-		'LRDM - Patriot season 2',
-		'Alice NEVERS',
-		'Emily in Paris',
-	]
+console.log('Districts des films favoris : ')
+console.log(getFavoriteFilmsLocations())
 
 // 📝 TODO: All filming locations for each film
 //     e.g. :
@@ -141,23 +150,42 @@ const favoriteFilms =
 //        'Une jeune fille qui va bien': [{...}]
 //     }
 function getFilmingLocationsPerFilm () {
-	return { }
+	const setFilm = new Set()
+	filmingLocations.forEach(film => setFilm.add(film.fields.nom_tournage))
+	const films = {}
+	setFilm.forEach(film_name => films[film_name] = [])
+	filmingLocations.forEach(film => films[film.fields.nom_tournage].push(film))
+	return films
 }
+//console.log('Films locations par film : ')
+//console.log(getFilmingLocationsPerFilm())
 
 // 📝 TODO: Count each type of film (Long métrage, Série TV, etc...)
 // 1. Implement the function
 // 2. Log the result
 function countFilmingTypes () {
-	return {}
+	const setTypes = new Set()
+	filmingLocations.forEach(film => setTypes.add(film.fields.type_tournage))
+	return setTypes.size
 }
+console.log('Il y a ' + countFilmingTypes() + ' types de film')
 
 // 📝 TODO: Sort each type of filming by count, from highest to lowest
 // 1. Implement the function. It should return a sorted array of objects like:
 //    [{type: 'Long métrage', count: 1234}, {...}]
 // 2. Log the result
 function sortedCountFilmingTypes () {
-	return []
+	const setTypes = new Set()
+	filmingLocations.forEach(film => setTypes.add(film.fields.type_tournage))
+	let array = []
+	setTypes.forEach(function(type) {
+		let dico = {}
+		dico[type] = filmingLocations.filter(function(o) {return o.fields.type_tournage == type}).length
+		array.push(dico)
+	})
+	return array.sort((a,b) => Object.values(b) - Object.values(a))
 }
+console.log(sortedCountFilmingTypes())
 
 /**
  * This arrow functions takes a duration in milliseconds and returns a
@@ -171,6 +199,22 @@ const duration = (ms) => `${(ms/(1000*60*60*24)).toFixed(0)} days, ${((ms/(1000*
 // 1. Implement the function
 // 2. Log the filming location, and its computed duration
 
+function LongestDurationFilm() {
+	let longestFilm = filmingLocations[0]
+	for(let i = 0; i < getFilmingLocationsNumber() - 1; i++) {
+		longestFilm = Date.parse(filmingLocations[i].fields.date_fin) - Date.parse(filmingLocations[i].fields.date_debut) < Date.parse(filmingLocations[i+1].fields.date_fin) - Date.parse(filmingLocations[i+1].fields.date_debut) ? filmingLocations[i+1] : filmingLocations[i]
+	}
+	return longestFilm.fields.nom_tournage + ' avec une durée de ' + duration(Date.parse(longestFilm.fields.date_fin) - Date.parse(longestFilm.fields.date_debut)) + ' est le film avec la plus grande duration'
+}
+
+console.log(LongestDurationFilm())
+
 // 📝 TODO: Compute the average filming duration
 // 1. Implement the function
 // 2. Log the result
+
+function AverageFilmingDuration() {
+	return duration(filmingLocations.map(film => Date.parse(film.fields.date_fin) - Date.parse(film.fields.date_debut)).reduce((dureeA, dureeB) => dureeA + dureeB)/getFilmingLocationsNumber())
+}
+
+console.log('La durée moyenne des filming location est : ' + AverageFilmingDuration())

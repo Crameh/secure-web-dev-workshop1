@@ -202,7 +202,7 @@ const duration = (ms) => `${(ms/(1000*60*60*24)).toFixed(0)} days, ${((ms/(1000*
 function LongestDurationFilm() {
 	let longestFilm = filmingLocations[0]
 	for(let i = 0; i < getFilmingLocationsNumber() - 1; i++) {
-		longestFilm = Date.parse(filmingLocations[i].fields.date_fin) - Date.parse(filmingLocations[i].fields.date_debut) < Date.parse(filmingLocations[i+1].fields.date_fin) - Date.parse(filmingLocations[i+1].fields.date_debut) ? filmingLocations[i+1] : filmingLocations[i]
+		longestFilm = Date.parse(longestFilm.fields.date_fin) - Date.parse(longestFilm.fields.date_debut) < Date.parse(filmingLocations[i+1].fields.date_fin) - Date.parse(filmingLocations[i+1].fields.date_debut) ? filmingLocations[i+1] : longestFilm
 	}
 	return longestFilm.fields.nom_tournage + ' avec une durée de ' + duration(Date.parse(longestFilm.fields.date_fin) - Date.parse(longestFilm.fields.date_debut)) + ' est le film avec la plus grande duration'
 }
